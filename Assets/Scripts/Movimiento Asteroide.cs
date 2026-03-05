@@ -1,19 +1,24 @@
 using System.Collections;
 using UnityEngine;
+using TMPro;
 
 public class MovimientoAsteroide : MonoBehaviour
 {
-    Rigidbody2D rbAsteroid;
+    public GameManager gamemanager;
+	Rigidbody2D rbAsteroid;
     private float randomX;
     private Vector2 destino;
     float duracion;
+    public TextMeshProUGUI gameoverText;
 	// Start is called once before the first execution of Update after the MonoBehaviour is created
 	void Start()
     {
+        
         rbAsteroid = GetComponent<Rigidbody2D>();
         randomX = Random.Range(-4.5f, 4.5f);
         destino = new Vector2(randomX, -6);
-        duracion = 3f;
+		//destino = new Vector2(transform.position.x, -6);
+		duracion = 3f;
 		StopAllCoroutines();
         StartCoroutine(moveAsteroid(destino, duracion));
         
@@ -22,13 +27,14 @@ public class MovimientoAsteroide : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        /*if (transform.position.y <= -6)
+		// El asteroide se mueve hacia abajo, y si llega a una posición específica, se destruye
+		/*if (transform.position.y <= -6)
         {
             Destroy(gameObject);
         }*/
-    }
+	}
 
-    private IEnumerator moveAsteroid (Vector2 destino, float duracion)
+	private IEnumerator moveAsteroid (Vector2 destino, float duracion)
     {
         float tiempoActual = 0f;
         Vector2 Inicio = rbAsteroid.position;
@@ -44,12 +50,25 @@ public class MovimientoAsteroide : MonoBehaviour
         rbAsteroid.MovePosition(destino);
 	}
 
-    void OnCollisionEnter2D(Collision2D collision)
+	// Detecta colisiones con otros objetos, y si el objeto tiene la etiqueta "Destroy", se destruye a sí mismo
+	void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject.CompareTag("Destroy"))
         {
             Destroy(gameObject);
         }
         Debug.Log("Colision con: " + collision.gameObject.name);
+
+        if (collision.gameObject.CompareTag("Player"))
+        {
+            gamemanager.GameOver();
+			Destroy(collision.gameObject);
+
+            CancelInvoke("spawnAsteroid");
+            Destroy(gameObject);
+
+		}
 	}
+
+	
 }
