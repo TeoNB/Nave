@@ -5,7 +5,8 @@ using UnityEngine.UI;
 
 public class Spawnlaser : MonoBehaviour
 {
-    public GameObject laserPrefab;
+    public GameManager gamemanager;
+	public GameObject laserPrefab;
     private PlayerInput playerInput;
     bool disparar = true;
     float tiempodisparo = 0.5f;
@@ -21,16 +22,24 @@ public class Spawnlaser : MonoBehaviour
     {
         if (playerInput.actions["Attack"].WasPressedThisFrame() && disparar)
         {
-            Instantiate(laserPrefab, new Vector2(transform.position.x, transform.position.y), Quaternion.identity);
-            disparar = false;
+            Controllaser laser = Instantiate(laserPrefab, new Vector2(transform.position.x, transform.position.y), Quaternion.identity).GetComponent<Controllaser>();
+            laser.gamemanager = gamemanager;
+			disparar = false;
             StartCoroutine(cambiardisparo());
         }
-    }
+
+        /*if (Input.GetKey(KeyCode.S))
+        {             Instantiate(laserPrefab, new Vector2(transform.position.x, transform.position.y), Quaternion.identity);
+            disparar = false;
+            StartCoroutine(cambiardisparo());
+		}*/
+	}
 
     IEnumerator cambiardisparo()
     {
         yield return new WaitForSeconds(tiempodisparo);
         disparar=true;
+
     }
 
 
